@@ -1,0 +1,34 @@
+server:
+  port: 8090
+spring:
+  profiles:
+    active: dev
+#    数据库相关配置
+  datasource:
+    druid:
+      driver-class-name: ${sky.datasource.driver-class-name}
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${sky.datasource.username}
+      password: ${sky.datasource.password}
+
+#      jpa相关配置
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+# 控制台格式化输出sql
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+#    database-platform: org.hibernate.dialect.MySQL8Dialect
+#    show-sql: true
+#    open-in-view: false
+#    properties:
+#        "hibernate.format_sql": true
+#    hibernate:
+#        ddl-auto: update
+#    hibernate:
+#      ddl-auto: update
+#
+#    show-sql: true
