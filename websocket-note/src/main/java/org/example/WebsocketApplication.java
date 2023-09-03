@@ -6,7 +6,7 @@ package org.example;
  * @author cjia
  * @date 2023/9/3 上午 10:24
  */
-public class Main {
+public class WebsocketApplication {
     public static void main(String[] args) {
         System.out.println("hello world!");
     }
