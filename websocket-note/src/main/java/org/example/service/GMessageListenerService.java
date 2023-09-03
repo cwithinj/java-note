@@ -1,5 +1,6 @@
 package org.example.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.example.domain.entity.UserSession;
 import org.example.domain.vo.SystemMessage;
@@ -68,8 +69,8 @@ public class GMessageListenerService {
      */
     @OnMessage
     public void onMessage(Session session, String message) throws IOException {
-        logger.info("接受到消息：" + message);
-        JSONObject jsonObject = JSONObject.parseObject(message);
+        logger.info("接受到消息{}", message);
+        JSONObject jsonObject = JSON.parseObject(message);
         logger.info("解析的内容:{}", jsonObject.get("type"));
         logger.info("解析的内容:{}", jsonObject.get("content"));
         SystemMessage systemMessage = jsonObject.toJavaObject(SystemMessage.class);
