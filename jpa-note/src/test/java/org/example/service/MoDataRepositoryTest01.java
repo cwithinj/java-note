@@ -1,5 +1,6 @@
 package org.example.service;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -138,5 +139,23 @@ class MoDataRepositoryTest01 {
 
         moDataVOS.forEach(System.out::println);
 
+    }
+
+    @Test
+    void test06() {
+        //动态拼接条件查询
+        BooleanBuilder whereBuilder = new BooleanBuilder();
+        //定义一个条件
+        String lineBody = "line1";
+        if (lineBody != null) {
+            whereBuilder.and(qMoData.lineBody.eq(lineBody));
+        }
+        //还可以拼接其他条件
+        //执行查询
+        List<MoData> moDataList = jpaQueryFactory.selectFrom(qMoData)
+                .where(qMoData.id.goe(50L)
+                        .and(whereBuilder))
+                .fetch();
+        moDataList.forEach(System.out::println);
     }
 }
