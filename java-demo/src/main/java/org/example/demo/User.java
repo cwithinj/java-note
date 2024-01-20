@@ -12,5 +12,9 @@ import lombok.Data;
 public class User {
     private String name;
     private int age;
+    //
+    //public String getInfo() {
+    //    return this.name + "-" + this.age;
+    //}
 
 }

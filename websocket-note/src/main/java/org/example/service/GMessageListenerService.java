@@ -42,6 +42,7 @@ public class GMessageListenerService {
         UserSession userSession = new UserSession(session.getId(), username, session);
         this.username = username;
         sessions.put(username, userSession);
+        //sessions.put(username, new ConcurrentWebSocketSessionDecorator(session, 10 * 1000, 64000));
         logger.info("【{}】用户进入, 当前连接数：{}", username + ":" + session.getId(), sessions.size());
     }
 
@@ -76,6 +77,7 @@ public class GMessageListenerService {
         SystemMessage systemMessage = jsonObject.toJavaObject(SystemMessage.class);
         logger.info("解析之后转换:{}", systemMessage);
         session.getBasicRemote().sendText("消息收到: " + message);
+        session.getAsyncRemote().sendText("sss");
     }
 
 
