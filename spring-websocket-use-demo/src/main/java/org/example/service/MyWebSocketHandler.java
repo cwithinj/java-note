@@ -10,15 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * websocekt的数据发送
  *
- * @author JIA*/
+ * @author JIA
+ */
 @Slf4j
 @Component
 public class MyWebSocketHandler implements WebSocketHandler {
     private ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private  final AtomicInteger onlineClientCount = new AtomicInteger(0);
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -29,10 +32,13 @@ public class MyWebSocketHandler implements WebSocketHandler {
         if (Objects.isNull(scanPoint)) {
             return;
         }
-        log.info("===========>扫码点:{}",scanPoint);
-        final String userId = extractParams(session, "userId");
-        log.info("===========>userId:{}",userId);
+        //log.info("===========>扫码点:{}", scanPoint);
+        //final String userId = extractParams(session, "userId");
+        //log.info("===========>userId:{}", userId);
         sessions.put(scanPoint, session);
+        //sessions.put(scanPoint, new ConcurrentWebSocketSessionDecorator(session, 10*1000, 10*1024));
+        onlineClientCount.incrementAndGet();
+        log.info("连接建立成功，当前在线数为：{} ==> 开始监听新连接：session_id = {}， id = {}", onlineClientCount, session.getId(), scanPoint);
 
     }
 
@@ -44,7 +50,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
         String payload = (String) message.getPayload();
         log.info("服务端收到客户端【{}】的消息:{}", scanPoint, payload);
         //这里假设服务端收到客户端的消息，需要返回信息
-        //sendMessageToScanPoint(scanPoint, payload);
+        sendMessage(scanPoint, payload);
     }
 
     @Override
@@ -56,6 +62,8 @@ public class MyWebSocketHandler implements WebSocketHandler {
         }
         // 将扫码点位和session从Map中移除
         sessions.remove(scanPoint);
+        onlineClientCount.decrementAndGet();
+        log.info("连接关闭成功，当前在线数为：{} ==> 关闭该连接信息：session_id = {}， id = {}", onlineClientCount, session.getId(), scanPoint);
     }
 
     @Override
@@ -67,6 +75,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         // 当WebSocket传输发生错误时调用
         // 可以在这里进行错误处理逻辑
+        log.error(exception.getMessage());
     }
 
     /**
@@ -94,12 +103,15 @@ public class MyWebSocketHandler implements WebSocketHandler {
         }
     }
 
-    public void sendMessageToScanPoint(String scanPoint, String message) throws IOException {
+    public void sendMessage(String scanPoint, String message) throws IOException {
         // 根据扫码点位获取对应的session，并发送消息
         if (!sessions.containsKey(scanPoint)) {
             return;
         }
-        sessions.get(scanPoint).sendMessage(new TextMessage(message));
+        if (sessions.get(scanPoint).isOpen()) {
+            sessions.get(scanPoint).sendMessage(new TextMessage(message));
+        }
+
 
     }
 
